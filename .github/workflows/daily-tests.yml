@@ -1,0 +1,54 @@
+name: Daily ERP Tests
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # 9:00 по Москве каждый день
+  workflow_dispatch:       # ручной запуск через GitHub UI
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd tests
+          npm install @playwright/test
+          npx playwright install chromium --with-deps
+
+      - name: Restore auth session
+        run: echo '${{ secrets.FMS_AUTH_STATE }}' > /tmp/fms-auth-state.json
+
+      - name: Run tests
+        env:
+          AUTH_STATE_PATH: /tmp/fms-auth-state.json
+          SCREENSHOTS_DIR: ${{ github.workspace }}/screenshots
+        run: |
+          cd tests
+          npx playwright test --config=playwright.config.js
+
+      - name: Generate report timestamp
+        if: always()
+        run: |
+          echo "## Последний прогон: $(TZ='Europe/Moscow' date '+%d.%m.%Y %H:%M') МСК" > reports/last-run.md
+          echo "" >> reports/last-run.md
+          echo "Запущено: GitHub Actions (daily schedule)" >> reports/last-run.md
+
+      - name: Commit and push results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add screenshots/ reports/
+          git diff --staged --quiet || git commit -m "auto: тесты $(TZ='Europe/Moscow' date '+%d.%m.%Y')"
+          git push
