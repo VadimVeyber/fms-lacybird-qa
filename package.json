@@ -1,0 +1,11 @@
+{
+  "name": "fms-lacybird-qa",
+  "version": "1.0.0",
+  "description": "QA тесты для fms.lacybird.ru",
+  "scripts": {
+    "test": "npx playwright test --config=tests/playwright.config.js"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.59.1"
+  }
+}

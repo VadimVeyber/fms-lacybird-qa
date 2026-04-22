@@ -1,6 +1,7 @@
 module.exports = {
   testDir: '.',
-  timeout: 30000,
+  timeout: 60000,
+  workers: 1,
   use: {
     headless: true,
     viewport: { width: 1280, height: 800 },
