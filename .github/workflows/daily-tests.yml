@@ -52,3 +52,27 @@ jobs:
           git add screenshots/ reports/
           git diff --staged --quiet || git commit -m "auto: тесты $(TZ='Europe/Moscow' date '+%d.%m.%Y')"
           git push
+
+      - name: Notify Telegram
+        if: always()
+        run: |
+          DATE=$(TZ='Europe/Moscow' date '+%d.%m.%Y %H:%M')
+          STATUS="${{ job.status }}"
+          if [ "$STATUS" = "success" ]; then
+            ICON="✅"
+            LABEL="Все тесты прошли"
+          else
+            ICON="🔴"
+            LABEL="Есть упавшие тесты"
+          fi
+
+          TEXT="${ICON} <b>FMS Tests — ${DATE} МСК</b>
+${LABEL}
+
+🔗 <a href='https://github.com/VadimVeyber/fms-lacybird-qa/actions/runs/${{ github.run_id }}'>Открыть лог</a>
+📁 <a href='https://github.com/VadimVeyber/fms-lacybird-qa'>Репозиторий</a>"
+
+          curl -s -X POST "https://api.telegram.org/${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d parse_mode=HTML \
+            -d text="$TEXT"
