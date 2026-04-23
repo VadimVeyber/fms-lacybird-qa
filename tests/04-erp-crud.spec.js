@@ -6,6 +6,9 @@ const { test, expect } = require('@playwright/test');
 const BASE = 'https://fms.lacybird.ru';
 const AUTH = '/tmp/fms-auth-state.json';
 
+// Возвращает последнее открытое модальное окно (.shadow-xl)
+const modal = (page) => page.locator('.shadow-xl').last();
+
 test.describe('ERP — CRUD: Единицы измерения', () => {
   test('[ERP-030] Создать и удалить единицу измерения', async ({ browser }) => {
     const ctx = await browser.newContext({ storageState: AUTH });
@@ -19,9 +22,9 @@ test.describe('ERP — CRUD: Единицы измерения', () => {
     await page.locator('button:has-text("Добавить")').first().click();
     await page.waitForTimeout(500);
 
-    // Заполнить название
-    const nameInput = page.locator('input[placeholder*="Назван"], input[placeholder*="назван"], input[type="text"]').first();
-    await nameInput.fill(unitName);
+    // Заполнить название (скоуп внутри модального окна, чтобы не попасть в поле Поиск)
+    const m = modal(page);
+    await m.locator('input[type="text"]').first().fill(unitName);
     await page.screenshot({ path: '/tmp/fms-tests/screenshots/erp-crud-unit-form.png' });
 
     // Сохранить
@@ -49,8 +52,8 @@ test.describe('ERP — CRUD: Контрагенты', () => {
     await page.locator('button:has-text("Добавить")').first().click();
     await page.waitForTimeout(500);
 
-    const nameInput = page.locator('input[type="text"]').first();
-    await nameInput.fill(name);
+    // Скоуп к модальному окну, чтобы не попасть в поле Поиск
+    await modal(page).locator('input[type="text"]').first().fill(name);
     await page.screenshot({ path: '/tmp/fms-tests/screenshots/erp-crud-contractor-form.png' });
 
     await page.locator('button:has-text("Сохранить"), button[type="submit"]').first().click();
@@ -76,8 +79,8 @@ test.describe('ERP — CRUD: Материалы', () => {
     await page.locator('button:has-text("Добавить группу")').first().click();
     await page.waitForTimeout(500);
 
-    const nameInput = page.locator('input[type="text"]').first();
-    await nameInput.fill(groupName);
+    // Скоуп к модальному окну, чтобы не попасть в поле Поиск
+    await modal(page).locator('input[type="text"]').first().fill(groupName);
     await page.screenshot({ path: '/tmp/fms-tests/screenshots/erp-crud-matgroup-form.png' });
 
     await page.locator('button:has-text("Сохранить"), button[type="submit"]').first().click();
@@ -103,8 +106,8 @@ test.describe('ERP — CRUD: Склады', () => {
     await page.locator('button:has-text("Добавить склад")').first().click();
     await page.waitForTimeout(500);
 
-    const nameInput = page.locator('input[type="text"]').first();
-    await nameInput.fill(warehouseName);
+    // Скоуп к модальному окну, чтобы не попасть в поле Поиск
+    await modal(page).locator('input[type="text"]').first().fill(warehouseName);
     await page.screenshot({ path: '/tmp/fms-tests/screenshots/erp-crud-warehouse-form.png' });
 
     await page.locator('button:has-text("Сохранить"), button[type="submit"]').first().click();
