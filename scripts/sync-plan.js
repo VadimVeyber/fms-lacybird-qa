@@ -3,28 +3,19 @@
  * Таблица должна быть публичной (просмотр по ссылке).
  * API-ключ не нужен — используется CSV-экспорт.
  */
-const https = require('https');
-const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
 const SHEET_ID = '12XI6bpA0oC54b54JfDQnc-95Jxwe_LqzfUGMKHOXkHA';
 const OUTPUT = path.join(__dirname, '../tests/test-plan.json');
 
-function get(url, redirects = 5) {
-  return new Promise((resolve, reject) => {
-    if (redirects === 0) return reject(new Error('Слишком много редиректов'));
-    const lib = url.startsWith('https') ? https : http;
-    lib.get(url, (res) => {
-      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        return resolve(get(res.headers.location, redirects - 1));
-      }
-      if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}`));
-      let data = '';
-      res.on('data', c => data += c);
-      res.on('end', () => resolve(data));
-    }).on('error', reject);
+async function get(url) {
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0' },
+    redirect: 'follow',
   });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.text();
 }
 
 function parseCSV(text) {
@@ -51,7 +42,7 @@ function parseCSV(text) {
 }
 
 async function main() {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
   console.log('Загружаю тест-план из Google Sheets...');
   const csv = await get(url);
   const plan = parseCSV(csv);
