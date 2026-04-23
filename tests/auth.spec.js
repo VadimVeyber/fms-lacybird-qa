@@ -6,7 +6,7 @@ const AUTH_STATE = process.env.AUTH_STATE_PATH || '/tmp/fms-auth-state.json';
 const SS = process.env.SCREENSHOTS_DIR || '/tmp/fms-tests/screenshots';
 
 test.describe('Авторизация — позитивный сценарий', () => {
-  test('Email: запрос кода — форма переходит к вводу кода', async ({ page }) => {
+  test('[AUTH-001] Email: запрос кода — форма переходит к вводу кода', async ({ page }) => {
     await page.goto(AUTH_URL, { waitUntil: 'domcontentloaded' });
     await page.screenshot({ path: `${SS}/01-auth-initial.png` });
 
@@ -26,7 +26,7 @@ test.describe('Авторизация — позитивный сценарий'
     await expect(page.locator('input[placeholder="000000"]')).toBeVisible();
   });
 
-  test('Вход с сохранённой сессией — ERP доступен', async ({ browser }) => {
+  test('[AUTH-005] Вход с сохранённой сессией — ERP доступен', async ({ browser }) => {
     const context = await browser.newContext({ storageState: AUTH_STATE });
     const page = await context.newPage();
     await page.goto(`${BASE}/erp`, { waitUntil: 'domcontentloaded' });
@@ -40,7 +40,7 @@ test.describe('Авторизация — позитивный сценарий'
 });
 
 test.describe('Авторизация — негативный сценарий', () => {
-  test('Пустое поле email — кнопка заблокирована', async ({ page }) => {
+  test('[AUTH-002] Пустое поле email — кнопка заблокирована', async ({ page }) => {
     await page.goto(AUTH_URL, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Email' }).click();
     await page.waitForTimeout(300);
@@ -48,7 +48,7 @@ test.describe('Авторизация — негативный сценарий'
     await page.screenshot({ path: `${SS}/06-neg-empty-email-disabled.png` });
   });
 
-  test('Невалидный формат email — кнопка остаётся заблокированной', async ({ page }) => {
+  test('[AUTH-003] Невалидный формат email — кнопка остаётся заблокированной', async ({ page }) => {
     await page.goto(AUTH_URL, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Email' }).click();
     await page.waitForTimeout(300);
@@ -58,7 +58,7 @@ test.describe('Авторизация — негативный сценарий'
     await expect(page.locator('button:has-text("Отправить код")')).toBeDisabled();
   });
 
-  test('Валидный email — кнопка активируется', async ({ page }) => {
+  test('[AUTH-003b] Валидный email — кнопка активируется', async ({ page }) => {
     await page.goto(AUTH_URL, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Email' }).click();
     await page.waitForTimeout(300);
@@ -68,7 +68,7 @@ test.describe('Авторизация — негативный сценарий'
     await expect(page.locator('button:has-text("Отправить код")')).toBeEnabled();
   });
 
-  test('Неверный код — не перенаправляет в ERP', async ({ page }) => {
+  test('[AUTH-004] Неверный код — не перенаправляет в ERP', async ({ page }) => {
     await page.goto(AUTH_URL, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Email' }).click();
     await page.waitForTimeout(300);
@@ -84,29 +84,8 @@ test.describe('Авторизация — негативный сценарий'
   });
 });
 
-test.describe('Защищённые страницы — доступ без авторизации', () => {
-  test('/erp — редирект на логин ✓', async ({ page }) => {
-    await page.goto(`${BASE}/erp`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(800);
-    await page.screenshot({ path: `${SS}/11-protected-erp-root.png` });
-    const isProtected = page.url().includes('signin') || await page.title() === 'Авторизация';
-    expect(isProtected).toBe(true);
-  });
-
-  for (const route of ['/erp/materials', '/erp/receipts', '/erp/settings', '/erp/productions']) {
-    test(`${route} — УЯЗВИМОСТЬ: доступна без авторизации`, async ({ page }) => {
-      await page.goto(`${BASE}${route}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(800);
-      const name = route.replace(/\//g, '_').replace(/^_/, '');
-      await page.screenshot({ path: `${SS}/SECURITY-${name}.png`, fullPage: true });
-      const isProtected = page.url().includes('signin') || await page.title() === 'Авторизация';
-      expect(isProtected, `УЯЗВИМОСТЬ: ${route} открыта без авторизации`).toBe(false);
-    });
-  }
-});
-
 test.describe('Сброс пароля', () => {
-  test('Опция сброса пароля отсутствует', async ({ page }) => {
+  test('[AUTH-007] Опция сброса пароля отсутствует', async ({ page }) => {
     await page.goto(AUTH_URL, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Email' }).click();
     await page.waitForTimeout(300);

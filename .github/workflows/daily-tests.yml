@@ -29,6 +29,9 @@ jobs:
           FMS_AUTH_STATE: ${{ secrets.FMS_AUTH_STATE }}
         run: echo "$FMS_AUTH_STATE" > /tmp/fms-auth-state.json
 
+      - name: Sync test plan from Google Sheets
+        run: node scripts/sync-plan.js
+
       - name: Run tests
         run: npx playwright test --config=playwright.config.js
         working-directory: tests
