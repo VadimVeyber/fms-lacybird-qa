@@ -2,8 +2,8 @@ name: Daily ERP Tests
 
 on:
   schedule:
-    - cron: '0 6 * * *'  # 9:00 по Москве каждый день
-  workflow_dispatch:       # ручной запуск через GitHub UI
+    - cron: '0 6 * * *'
+  workflow_dispatch:
 
 jobs:
   test:
@@ -21,10 +21,8 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: |
-          cd tests
-          npm install @playwright/test
-          npx playwright install chromium --with-deps
+        run: npm install @playwright/test && npx playwright install chromium --with-deps
+        working-directory: tests
 
       - name: Restore auth session
         env:
@@ -32,28 +30,22 @@ jobs:
         run: echo "$FMS_AUTH_STATE" > /tmp/fms-auth-state.json
 
       - name: Run tests
-        run: |
-          cd tests
-          npx playwright test --config=playwright.config.js
-        env:
-          SCREENSHOTS_DIR: ${{ github.workspace }}/screenshots
+        run: npx playwright test --config=playwright.config.js
+        working-directory: tests
 
-      - name: Generate report
+      - name: Save report
         if: always()
         run: |
           mkdir -p reports
-          DATE=$(TZ='Europe/Moscow' date '+%d.%m.%Y %H:%M')
-          echo "## Последний прогон: ${DATE} МСК" > reports/last-run.md
-          echo "" >> reports/last-run.md
-          echo "Запущено: GitHub Actions (daily schedule)" >> reports/last-run.md
+          echo "Last run $(date -u '+%Y-%m-%d %H:%M') UTC" > reports/last-run.md
 
-      - name: Commit and push results
+      - name: Commit results
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add screenshots/ reports/
-          git diff --staged --quiet || git commit -m "auto: тесты $(TZ='Europe/Moscow' date '+%d.%m.%Y')"
+          git add screenshots/ reports/ || true
+          git diff --staged --quiet || git commit -m "auto: tests $(date -u '+%Y-%m-%d')"
           git push
 
       - name: Notify Telegram
@@ -61,22 +53,14 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          RUN_ID: ${{ github.run_id }}
-          JOB_STATUS: ${{ job.status }}
+          RUN_URL: https://github.com/VadimVeyber/fms-lacybird-qa/actions/runs/${{ github.run_id }}
+          STATUS: ${{ job.status }}
         run: |
-          DATE=$(TZ='Europe/Moscow' date '+%d.%m.%Y %H:%M')
-          if [ "$JOB_STATUS" = "success" ]; then
-            ICON="✅"
-            LABEL="Все тесты прошли"
+          if [ "$STATUS" = "success" ]; then
+            MSG="FMS Tests OK - $RUN_URL"
           else
-            ICON="🔴"
-            LABEL="Есть упавшие тесты"
+            MSG="FMS Tests FAILED - $RUN_URL"
           fi
-          TEXT="${ICON} FMS Tests (CI) — ${DATE} МСК
-${LABEL}
-
-Лог: https://github.com/VadimVeyber/fms-lacybird-qa/actions/runs/${RUN_ID}"
           curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${CHAT_ID}" \
-            --data-urlencode "text=${TEXT}" \
-            -d "parse_mode=HTML"
+            -d "chat_id=${CHAT_ID}" \
+            --data-urlencode "text=${MSG}"
