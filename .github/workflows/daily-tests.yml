@@ -42,6 +42,13 @@ jobs:
           mkdir -p reports
           echo "Last run $(date -u '+%Y-%m-%d %H:%M') UTC" > reports/last-run.md
 
+      - name: Write results to Google Sheets
+        if: always()
+        env:
+          SHEETS_WEBHOOK_URL: ${{ secrets.SHEETS_WEBHOOK_URL }}
+          REPORT_PATH: /tmp/fms-tests/results.json
+        run: node scripts/write-results.js
+
       - name: Commit results
         if: always()
         run: |
