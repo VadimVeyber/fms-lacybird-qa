@@ -60,7 +60,7 @@ test.describe('ERP — Страницы загружаются и содержа
 });
 
 test.describe('ERP — Навигационные ссылки в шапке', () => {
-  test('[ERP-020] Все пункты меню присутствуют на дашборде', async ({ browser }) => {
+  test('[ERP-022] Все пункты меню присутствуют на дашборде', async ({ browser }) => {
     const ctx = await browser.newContext({ storageState: AUTH });
     const page = await ctx.newPage();
     await page.goto(`${BASE}/erp`, { waitUntil: 'domcontentloaded' });

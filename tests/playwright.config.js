@@ -3,7 +3,7 @@ try {
   const plan = require('./test-plan.json');
   const enabledIds = Object.entries(plan)
     .filter(([, v]) => v !== 0)
-    .map(([id]) => `\\[${id}`);
+    .map(([id]) => `\\[${id}\\]`);
   if (enabledIds.length > 0) {
     grepPattern = new RegExp(enabledIds.join('|'));
   }

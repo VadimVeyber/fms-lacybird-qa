@@ -32,7 +32,7 @@ test.describe('SCHED — Навигация по разделам', () => {
   const TABS = [
     { name: 'График смен', id: 'SCHED-040a' },
     { name: 'Сотрудники',  id: 'SCHED-020a' },
-    { name: 'Отделы',      id: 'SCHED-010a' },
+    { name: 'Отделы',      id: 'SCHED-013a' },
     { name: 'Должности',   id: 'SCHED-011a' },
     { name: 'Проекты',     id: 'SCHED-012a' },
   ];

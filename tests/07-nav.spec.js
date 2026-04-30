@@ -58,8 +58,8 @@ test.describe('NAV — Выход из системы', () => {
   });
 });
 
-test.describe('AUTH — Сохранённая сессия', () => {
-  test('[AUTH-005] Сохранённая сессия открывает ERP без логина', async ({ browser }) => {
+test.describe('NAV — Сохранённая сессия', () => {
+  test('[NAV-003] Сохранённая сессия открывает ERP без логина', async ({ browser }) => {
     const ctx = await browser.newContext({ storageState: AUTH });
     const page = await ctx.newPage();
     await page.goto(`${BASE}/erp`, { waitUntil: 'domcontentloaded' });

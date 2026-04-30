@@ -10,7 +10,7 @@ const AUTH = '/tmp/fms-auth-state.json';
 const modal = (page) => page.locator('.shadow-xl').last();
 
 test.describe('ERP — CRUD: Единицы измерения', () => {
-  test('[ERP-030] Создать и удалить единицу измерения', async ({ browser }) => {
+  test('[ERP-030c] Создать и удалить единицу измерения', async ({ browser }) => {
     const ctx = await browser.newContext({ storageState: AUTH });
     const page = await ctx.newPage();
     await page.goto(`${BASE}/erp/units`, { waitUntil: 'domcontentloaded' });
@@ -41,7 +41,7 @@ test.describe('ERP — CRUD: Единицы измерения', () => {
 });
 
 test.describe('ERP — CRUD: Контрагенты', () => {
-  test('[ERP-031] Создать контрагента', async ({ browser }) => {
+  test('[ERP-031c] Создать контрагента', async ({ browser }) => {
     const ctx = await browser.newContext({ storageState: AUTH });
     const page = await ctx.newPage();
     await page.goto(`${BASE}/erp/contractors`, { waitUntil: 'domcontentloaded' });
@@ -68,7 +68,7 @@ test.describe('ERP — CRUD: Контрагенты', () => {
 });
 
 test.describe('ERP — CRUD: Материалы', () => {
-  test('[ERP-040] Добавить группу материалов', async ({ browser }) => {
+  test('[ERP-040c] Добавить группу материалов', async ({ browser }) => {
     const ctx = await browser.newContext({ storageState: AUTH });
     const page = await ctx.newPage();
     await page.goto(`${BASE}/erp/materials`, { waitUntil: 'domcontentloaded' });
@@ -95,7 +95,7 @@ test.describe('ERP — CRUD: Материалы', () => {
 });
 
 test.describe('ERP — CRUD: Склады', () => {
-  test('[ERP-050] Добавить склад', async ({ browser }) => {
+  test('[ERP-050c] Добавить склад', async ({ browser }) => {
     const ctx = await browser.newContext({ storageState: AUTH });
     const page = await ctx.newPage();
     await page.goto(`${BASE}/erp/warehouses`, { waitUntil: 'domcontentloaded' });
@@ -145,7 +145,7 @@ test.describe('ERP — CRUD: Приёмки', () => {
 });
 
 test.describe('ERP — CRUD: Рецепты', () => {
-  test('[ERP-060] Кнопка создания рецепта открывает форму', async ({ browser }) => {
+  test('[ERP-060c] Кнопка создания рецепта открывает форму', async ({ browser }) => {
     const ctx = await browser.newContext({ storageState: AUTH });
     const page = await ctx.newPage();
     await page.goto(`${BASE}/erp/recipes`, { waitUntil: 'domcontentloaded' });
@@ -181,7 +181,7 @@ test.describe('ERP — CRUD: Производство', () => {
 });
 
 test.describe('ERP — Настройки: пользователи и роли', () => {
-  test('[ERP-070] Страница настроек содержит вкладки Пользователи и Роли', async ({ browser }) => {
+  test('[ERP-070c] Страница настроек содержит вкладки Пользователи и Роли', async ({ browser }) => {
     const ctx = await browser.newContext({ storageState: AUTH });
     const page = await ctx.newPage();
     await page.goto(`${BASE}/erp/settings`, { waitUntil: 'domcontentloaded' });
