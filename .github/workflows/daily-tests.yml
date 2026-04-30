@@ -94,12 +94,12 @@ jobs:
             ICON="🔴"
             LABEL="Упало тестов: $FAILED"
           fi
-          MSG="${ICON} FMS Tests — ${TIMESTAMP}
-${LABEL}
-
-📊 Прошло: ${PASSED} / ${TOTAL}
-📁 Результаты в репозитории
-🔗 ${RUN_URL}"
+          MSG=$(printf '%s\n%s\n\n%s\n%s\n%s' \
+            "${ICON} FMS Tests — ${TIMESTAMP}" \
+            "${LABEL}" \
+            "📊 Прошло: ${PASSED} / ${TOTAL}" \
+            "📁 Результаты в репозитории" \
+            "🔗 ${RUN_URL}")
           curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
             -d "chat_id=${CHAT_ID}" \
             --data-urlencode "text=${MSG}"
