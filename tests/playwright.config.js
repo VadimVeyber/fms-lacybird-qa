@@ -4,8 +4,7 @@ try {
   const enabledIds = Object.entries(plan)
     .filter(([, v]) => v !== 0)
     .map(([id]) => `\\[${id}`);
-  const disabledCount = Object.values(plan).filter(v => v === 0).length;
-  if (disabledCount > 0 && enabledIds.length > 0) {
+  if (enabledIds.length > 0) {
     grepPattern = new RegExp(enabledIds.join('|'));
   }
 } catch (_) {
